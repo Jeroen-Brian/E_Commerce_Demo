@@ -3,11 +3,11 @@ import { Products } from "./products"
 import { Users } from "./users"
 
 @Entity()
-export class Wishlist extends BaseEntity{
+export class User_Cart extends BaseEntity{
 
     @PrimaryGeneratedColumn
     ("uuid", {
-        name: "wishlist_id"
+        name: "cart_id"
     })
     id: string
 
@@ -16,11 +16,11 @@ export class Wishlist extends BaseEntity{
     })
     userId: string
 
-    @OneToMany(() => Products, (prod) => prod.wishlist)
-    prodId: Products[]
+    @OneToMany(() => Products, (prod) => prod.cart)
+    products: Products[]
 
     @OneToOne(() => Users, (user) => user.id)
-    @JoinColumn({name: 'user_ref_id'})
+    @JoinColumn({ name: 'user_id'})
     user: Users
 
     @CreateDateColumn({ name: 'created_at'})

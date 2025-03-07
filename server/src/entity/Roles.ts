@@ -1,4 +1,3 @@
-import { UUID } from "crypto"
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, ManyToOne, OneToMany, CreateDateColumn, UpdateDateColumn, Timestamp, BaseEntity } from "typeorm"
 
 export enum roleTypes {
@@ -10,19 +9,23 @@ export enum roleTypes {
 @Entity()
 export class Roles extends BaseEntity{
 
-    @PrimaryGeneratedColumn()
-    roleId: UUID
+    @PrimaryGeneratedColumn
+    ("uuid", {
+        name: "role_id"
+    })
+    id: string
 
     @Column({
+        name: 'role_name',
         unique: true,
         enum: roleTypes
     })
     roleName: string
 
-    @CreateDateColumn()
+    @CreateDateColumn({ name: 'created_at'})
     createdAt: Timestamp
 
-    @UpdateDateColumn()
+    @UpdateDateColumn({ name: 'updated_at'})
     updatedAt: Timestamp
 
 }
