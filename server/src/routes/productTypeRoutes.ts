@@ -1,7 +1,8 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, Request, Response } from "express";
 import { Product_Types } from '../entity/productTypes'
 import { Roles } from '../entity/roles'
 import authenticateToken from "../controllers/authenticateToken";
+import { failed400, failed401, failed403, failed500, success } from "../utils/responses";
 
 
 const router = Router();
@@ -27,24 +28,19 @@ router.post('/types', authenticateToken, async (req: Request, res: Response) => 
             await newProductType.save();
 
             res.json({
-                Status: "Success",
-                Status_Code: 200,
-                Status_Message: "New Product Type added successfully!",
-                newProductType: newProductType
+                ...success,
+                newProductType: {
+                    id: newProductType.id,
+                    name: newProductType.name,
+                    description: newProductType.description,
+                    products: newProductType.products
+                }
             })
         } else {
-            res.status(400).json({
-                Status: "Failed",
-                Status_Code: 400,
-                Status_Message: "Product type already available."
-            })
+            res.status(400).json(failed400)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -58,26 +54,15 @@ router.get('/types', authenticateToken, async (req: Request, res: Response) => {
         if(types !== null)
         {
             res.json({
-                Status: "Success",
-                Status_Code: 200,
-                Status_Message: "Product Types retrieved successfully!",
+                ...success,
                 productTypes: types
             })
         }
         else{
-            res.status(401).json({
-                Status: "Failed",
-                Status_Code: 401,
-                Status_Message: "Authorisation error.",
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -98,28 +83,16 @@ router.delete('/types', authenticateToken, async (req: Request, res: Response) =
                 name: name
             })
             res.json({
-                Status: "Success",
-                Status_Code: 200,
-                Status_Message: "Product Type deleted successfully!",
-                product: ProductType
+                ...success,
+                deletedProductType: ProductType
             })
         } else {
-            res.status(400).json({
-                Status: "Failed",
-                Status_Code: 400,
-                Status_Message: "Product type not present."
-            })
+            res.status(403).json(failed403)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
-  
 
 export default router;
-

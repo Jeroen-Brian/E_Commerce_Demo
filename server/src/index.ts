@@ -2,9 +2,9 @@ import { PostgresDataSource } from "./data-source"
 import * as express from 'express';
 import * as dotenv from 'dotenv';
 import { Request, Response } from 'express';
-import swaggerUi = require('swagger-ui-express')
+import * as swaggerUi from 'swagger-ui-express'
 
-import YAML = require("yamljs");
+import* as YAML from 'yamljs';
 import userRoutes from './routes/userRoutes'
 import rolesRoutes from './routes/rolesRoutes'
 import productTypeRoutes from './routes/productTypeRoutes'
@@ -17,7 +17,7 @@ import orderRoutes from './routes/orderRoutes'
 
 
 
-// const swaggerDocument = YAML.load('./swagger.yaml')
+const swaggerDocument = YAML.load('../swagger.yaml')
 dotenv.config();
 
 
@@ -31,7 +31,7 @@ app.get('/send/:id', async (req: Request, res: Response) => {
     res.json("Express and TypeORM application")
 })
 
-// app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(userRoutes);
 app.use(rolesRoutes);
 app.use(productTypeRoutes);
@@ -52,4 +52,3 @@ PostgresDataSource.initialize()
     .catch((err) => {
         console.error("Error during Data Source initialization", err)
     })
-

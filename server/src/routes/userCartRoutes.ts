@@ -1,9 +1,9 @@
-import { Router, Request, Response, NextFunction } from "express";
-
+import { Router, Request, Response } from "express";
 import { Products } from '../entity/products'
 import { Users } from "../entity/users";
 import { User_Cart } from "../entity/userCart";
 import authenticateToken from "../controllers/authenticateToken";
+import { failed400, failed401, failed403, failed500, success } from "../utils/responses";
 
 
 const router = Router();
@@ -52,55 +52,50 @@ router.post('/cart', authenticateToken, async (req: Request, res: Response) => {
                 await newCartItem.save();
 
                 res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Product added to cart!",
+                    ...success,
                     newCartItem: newCartItem
                 })
             } else {
-                const newCartItem = await User_Cart.findOne({
-                    where: { 
-                        userId: req.user.User[0].id
-                    },
-                    relations: { 
-                        user:true, 
-                        products:true
-                    }
-                });
-
-                newCartItem?.products.push(prod[0]);
-                await User_Cart.find({
-                    where:{
-                        userId: req.user.User[0].id
-                    },
-                    relations:{
-                        user: true,
-                        products: true
-                    }
-                })
-
-                await newCartItem?.save()
-
-                res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Product added to cart!",
-                    UserCart: newCartItem
-                })
+                try {
+                    const newCartItem = await User_Cart.findOne({
+                        where: { 
+                            userId: req.user.User[0].id
+                        },
+                        relations: { 
+                            user:true, 
+                            products:true
+                        }
+                    });
+    
+                    newCartItem?.products.push(prod[0]);
+                    await User_Cart.find({
+                        where:{
+                            userId: req.user.User[0].id
+                        },
+                        relations:{
+                            user: true,
+                            products: true
+                        }
+                    })
+    
+                    await newCartItem?.save()
+    
+                    res.json({
+                        ...success,
+                        UserCart: newCartItem
+                    })
+                } catch (error) {
+                    res.status(403).json({
+                        ...failed403,
+                        Status_Message: "Product already in cart."
+                    })
+                }
             }
         } else{
-            res.status(403).json({
-                Status: "Failed",
-                Status_Code: 403,
-                Status_Message: "Product already in cart."
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -123,25 +118,15 @@ router.get('/cart', authenticateToken, async (req: Request, res: Response) => {
                 }
             })
             res.json({
-                Status: "Success",
-                Status_Code: 200,
-                Status_Message: "Cart retrieved successfully!",
+                ...success,
                 Cart: cart
             })
         }
         else{
-            res.status(401).json({
-                Status: "Failed",
-                Status_Code: 400,
-                Status_Message: "Authorization error.",
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.json(failed500)
     }
 })
 
@@ -172,11 +157,7 @@ router.delete('/cart', async (req: Request, res: Response) => {
             });
 
             if (cart[0].products.length == 0) {
-                res.status(400).json({
-                    Status: "Failed",
-                    Status_Code: 400,
-                    Status_Message: "Nothing to remove in Cart.",
-                })
+                res.status(403).json(failed403)
             } else {
                 const cartProd = await User_Cart.findOne({
                     where: { 
@@ -204,37 +185,21 @@ router.delete('/cart', async (req: Request, res: Response) => {
 
                     await cartProd?.save()
 
-                    res.json({
-                        Status: "Success",
-                        Status_Code: 200,
-                        Status_Message: "Product deleted from cart!",
-                        Wishlist: cartProd
-                    })
+                    res.json(success)
                 } else {
-                    res.json({
-                        Status: "Failed",
-                        Status_Code: 200,
+                    res.status(400).json({
+                        ...failed400,
                         Status_Message: "Product not in cart.",
                     })
                 }
             }
         } else{
-            res.status(403).json({
-                Status: "Failed",
-                Status_Code: 403,
-                Status_Message: "Authorization error."
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
-
   
 
 export default router;
-

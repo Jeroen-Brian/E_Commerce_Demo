@@ -4,6 +4,7 @@ import { Products } from '../entity/products'
 import { Users } from "../entity/users";
 import { Wishlist } from "../entity/wishlist";
 import authenticateToken from "../controllers/authenticateToken";
+import { failed400, failed401, failed403, failed500, success } from "../utils/responses";
 
 
 const router = Router();
@@ -51,56 +52,48 @@ router.post('/wishlist', authenticateToken, async (req: Request, res: Response) 
                 await newWishlist.save();
     
                 res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Product added to wishlist!",
-                    newWishlist: newWishlist
+                    ...success,
+                    Wishlist: newWishlist
                 })
             } else {
-                const newWishlistProd = await Wishlist.findOne({
-                    where: { 
-                        userId: req.user.User[0].id
-                    }, 
-                    relations:{ 
-                        user:true, 
-                        prodId:true
-                    }
-                });
-
-                newWishlistProd?.prodId.push(prod[0]);
-                
-                await Wishlist.find({
-                    where:{ 
-                        userId: req.user.User[0].id
-                    },
-                    relations:{
-                        user:true,
-                        prodId:true
-                    }
-                })
-
-                await newWishlistProd?.save()
-
-                res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Product added to wishlist!",
-                    Wishlist: newWishlistProd
-                })
+                try {
+                    const newWishlistProd = await Wishlist.findOne({
+                        where: { 
+                            userId: req.user.User[0].id
+                        }, 
+                        relations:{ 
+                            user:true, 
+                            prodId:true
+                        }
+                    });
+    
+                    newWishlistProd?.prodId.push(prod[0]);
+                    
+                    await Wishlist.find({
+                        where:{ 
+                            userId: req.user.User[0].id
+                        },
+                        relations:{
+                            user:true,
+                            prodId:true
+                        }
+                    })
+    
+                    await newWishlistProd?.save()
+    
+                    res.json({
+                        ...success,
+                        Wishlist: newWishlistProd
+                    })
+                } catch (error) {
+                    res.status(403).json(failed403)
+                }
             }
         } else{
-            res.status(403).json({
-                Status: "Failed",
-                Status_Code: 403,
-                Status_Message: "Product already in wishlist."
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error."
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -123,25 +116,15 @@ router.get('/wishlist', authenticateToken, async (req: Request, res: Response) =
                 }
             })
             res.json({
-                Status: "Success",
-                Status_Code: 200,
-                Status_Message: "Wishlist retrieved successfully!",
+                ...success,
                 Wishtlist: wishList
             })
         }
         else{
-            res.status(401).json({
-                Status: "Failed",
-                Status_Code: 401,
-                Status_Message: "Authorization error.",
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -165,11 +148,7 @@ router.delete('/wishlist', authenticateToken, async (req: Request, res: Response
             const wishList = await Wishlist.find({where: { userId: req.user.User[0].id}, relations:{ prodId:true}});
 
             if (wishList[0].prodId.length == 0){
-                res.status(400).json({
-                    Status: "Failed",
-                    Status_Code: 400,
-                    Status_Message: "Nothing to remove in Wishlist."
-                })
+                res.status(403).json(failed403)
             } else {
                 const wishlistProd = await Wishlist.findOne({
                     where: { 
@@ -197,29 +176,17 @@ router.delete('/wishlist', authenticateToken, async (req: Request, res: Response
                 await wishlistProd?.save()
 
                 res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Product deleted from wishlist!",
+                    ...success,
                     Wishlist: wishlistProd
                 })
             }
         } else{
-            res.status(403).json({
-                Status: "Failed",
-                Status_Code: 403,
-                Status_Message: "Authorization error."
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error."
-        })
+        res.status(500).json(failed500)
     }
 })
 
-  
 
 export default router;
-

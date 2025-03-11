@@ -1,10 +1,11 @@
-import { Router, Request, Response, NextFunction } from "express";
+import { Router, Request, Response } from "express";
 
 import { Users } from "../entity/users";
 import { User_Cart } from "../entity/userCart";
 import authenticateToken from "../controllers/authenticateToken";
 import { Order } from "../entity/order";
 import { Addresses } from "../entity/addresses";
+import { failed400, failed401, failed403, failed500, success } from "../utils/responses";
 
 
 const router = Router();
@@ -57,31 +58,17 @@ router.post('/order', authenticateToken, async (req: Request, res: Response) => 
                 await newOrder.save();
     
                 res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Order Placed!",
-                    newProduct: newOrder
+                    ...success,
+                    newOrder: newOrder
                 })
             } catch (error) {
-                res.status(400).json({
-                    Status: "Failed",
-                    Status_Code: 400,
-                    Status_Message: "Address is invalid."
-                })
+                res.status(400).json(failed400)
             }
         } else{
-            res.status(403).json({
-                Status: "Failed",
-                Status_Code: 403,
-                Status_Message: "Authorization error."
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -107,25 +94,15 @@ router.get('/order', authenticateToken, async (req: Request, res: Response) => {
                 }
             })
             res.json({
-                Status: "Success",
-                Status_Code: 200,
-                Status_Message: "Wishlist retrieved successfully!",
+                ...success,
                 Order: order
             })
         }
         else{
-            res.status(401).json({
-                Status: "Failed",
-                Status_Code: 401,
-                Status_Message: "Could not get details due to inauthorisation. Please try again.",
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
@@ -144,36 +121,23 @@ router.delete('/order', async (req: Request, res: Response) => {
                 })
 
                 res.json({
-                    Status: "Success",
-                    Status_Code: 200,
-                    Status_Message: "Order deleted successfully!",
-                    deletedProduct: delOrder
+                    ...success,
+                    deletedOrder: delOrder
                 })
             } catch (error) {
-                res.status(400).json({
-                    Status: "Failed",
-                    Status_Code: 400,
+                res.status(403).json({
+                    ...failed403,
                     Status_Message: "Order not present."
                 })
             }
         }
         else{
-            res.status(403).json({
-                Status: "Failed",
-                Status_Code: 403,
-                Status_Message: "Authorization error."
-            })
+            res.status(401).json(failed401)
         }
     } catch (error) {
-        res.status(500).json({
-            Status: "Failed",
-            Status_Code: 500,
-            Status_Message: "Server error.",
-        })
+        res.status(500).json(failed500)
     }
 })
 
-  
 
 export default router;
-

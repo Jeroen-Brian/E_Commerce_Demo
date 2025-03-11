@@ -1,6 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import * as jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
+import '../utils/responses'
+import { failed400, failed401 } from "../utils/responses";
+
 
 dotenv.config();
 
@@ -22,11 +25,7 @@ function authenticateToken(req: Request, res: Response, next: NextFunction){
     const token = header && header.split(' ')[1]
     let decoded: string | jwt.JwtPayload;
     if (token == null) {
-        res.status(400).json({
-            Status: "Failed",
-            Status_Code: 400,
-            Status_Message: "Token invalid."
-        })
+        res.status(401).json(failed401)
     }
     else{
         decoded = jwt.verify(token, process.env.SECRET_ACCESS_TOKEN)

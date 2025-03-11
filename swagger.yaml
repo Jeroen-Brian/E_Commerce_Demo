@@ -1,0 +1,1391 @@
+openapi: 3.0.0
+info:
+  title: JWT Authentication and Prisma testing
+  description:
+  version: 0.1.9
+
+servers:
+  - url: http://localhost:4500
+    description: Port link for testing
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  security:
+    - bearerAuth: []
+
+  /login:
+    post:
+      summary: Validates User Login throught the process of JWT Authentication.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              email: "#enter-here"
+              password: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 201
+                  Status_Message: "Successfully logged in! The Authorisation Token is provided below."
+                  accessToken: "#64_bit_token"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 401
+                  Status_Message: "Wrong Email or Password entered. Please try again."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+  /signup:
+    post:
+      summary: Creates a new User Account.
+      tags:
+        - User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              name: "#enter here"
+              email: "#enter-here"
+              password: "#enter-here"
+              roleId: "#enter-here"
+      responses:
+        "201": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 201
+                  Status_Message: "Account created successfully! Here are your details and the authorisation token."
+                  Data: #new-user-data
+                    id: "#id"
+                    name: "#name"
+                    email: "#email"
+                    role: "#role"
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Email already used."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+  /profile:
+    get:
+      summary: Gets user information after authentication.
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Signed in successfully! Here are your Profile details."
+                    Profile_data:
+                      id: "#id"
+                      name: "#name"
+                      email: "#email"
+                      password: "#password"
+                      role: "#role"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Wrong email or password entered. Please try again."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes a user account after authentication.
+      security:
+        - bearerAuth: []
+      tags:
+        - User
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "User Account Deleted succesfully."
+                    Deleted_User_Profile: "#user-details"
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /profile/all:
+    get:
+      summary: Gets user information after authentication.
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Profiles obtained successfully!"
+                    Users: "#users"
+
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /roles:
+    post:
+      summary: Creates a new Role.
+      tags:
+        - Roles
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              roleName: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Role created successfully!"
+                  newRoleProfile: "#role-data"
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Role already exists."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the roles available.
+      tags:
+        - Roles
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Roles obtained successfully!"
+                    Role_data: "#role"
+        # "401": # status code
+        #   description: A JSON array of the response
+        #   content:
+        #     application/json:
+        #       schema:
+        #         type: array
+        #         items:
+        #           type: object
+        #           example:
+        #             Status: "Failed"
+        #             Status_Code: 401
+        #             Status_Message: "Wrong email or password entered. Please try again."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    # delete:
+    #   summary: Deletes a user account after authentication.
+    #   security:
+    #     - bearerAuth: []
+    #   tags:
+    #     - User
+    #   responses:
+    #     "200": # status code
+    #       description: A JSON array of the response
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: array
+    #             items:
+    #               type: object
+    #               example:
+    #                 Status: "Success"
+    #                 Status_Code: 200
+    #                 Status_Message: "User Account Deleted succesfully."
+    #                 Deleted_User_Profile: "#user-details"
+    #     "400": # status code
+    #       description: A JSON array of the response
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: array
+    #             items:
+    #               type: object
+    #               example:
+    #                 Status: "Failed"
+    #                 Status_Code: 400
+    #                 Status_Message: "Authorization error."
+    #     "500": # status code
+    #       description: A JSON array of the response
+    #       content:
+    #         application/json:
+    #           schema:
+    #             type: array
+    #             items:
+    #               type: object
+    #               example:
+    #                 Status: "Failed"
+    #                 Status_Code: 500
+    #                 Status_Message: "Server error."
+
+  /types:
+    post:
+      summary: Adding a new product type.
+      security:
+        - bearerAuth: []
+      tags:
+        - Product Types
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              name: "#enter-here"
+              description: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Product type created successfully!"
+                  newProductType: "#product-type"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 403
+                  Status_Message: "Product type already exists."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the product types available.
+      tags:
+        - Product Types
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Product Types obtained successfully!"
+                    productTypes: "#productTypes"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes a product type after authentication.
+      security:
+        - bearerAuth: []
+      tags:
+        - Product Types
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              name: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Product Type deleted successfully."
+                    deletedProductType: "#product-type"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 403
+                    Status_Message: "Product type not present."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /types/products:
+    post:
+      summary: Adding a new product to a product type.
+      security:
+        - bearerAuth: []
+      tags:
+        - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              prodName: "#enter-here"
+              cost: "#enter-here"
+              description: "#enter-here"
+              prodType: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Product added successfully!"
+                  newProduct: "#product"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 403
+                  Status_Message: "Product already exists."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the product types available.
+      tags:
+        - Products
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Products obtained successfully!"
+                    products: "#products"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes a user account after authentication.
+      security:
+        - bearerAuth: []
+      tags:
+        - Products
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              prodName: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Product deleted successfully."
+                    deletedProductType: "#product-type"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 403
+                    Status_Message: "Product not present."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /wishlist:
+    post:
+      summary: Adding a new product to wishlist.
+      security:
+        - bearerAuth: []
+      tags:
+        - Wishlist
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              prodName: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Product added to wishlist!"
+                  Wishlist: "#product"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 403
+                  Status_Message: "Product already in wishlist."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the wishlist.
+      tags:
+        - Wishlist
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Wishlist obtained successfully!"
+                    wishlist: "#wishlist"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes a product from the wishlist after authentication.
+      security:
+        - bearerAuth: []
+      tags:
+        - Wishlist
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              prodName: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Product deleted successfully."
+                    deletedProduct: "#product-type"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 403
+                    Status_Message: "Product not present."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /cart:
+    post:
+      summary: Adding a new product to cart.
+      security:
+        - bearerAuth: []
+      tags:
+        - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              prodName: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Product added to cart!"
+                  Cart: "#product"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 403
+                  Status_Message: "Product already in cart."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the wishlist.
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Cart obtained successfully!"
+                    Cart: "#cart"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes a product from the wishlist after authentication.
+      security:
+        - bearerAuth: []
+      tags:
+        - Cart
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              prodName: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Product deleted from Cart!"
+                    deletedProduct: "#product"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 403
+                    Status_Message: "Product not present."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /address:
+    post:
+      summary: Adding a new address.
+      security:
+        - bearerAuth: []
+      tags:
+        - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              address: "#enter-here"
+              addressType: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Address stored!"
+                  newAddress: "#address"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 403
+                  Status_Message: "Address type already stored."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the addresses.
+      tags:
+        - Address
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Addresses retrieved successfully!"
+                    Addresses: "#addresses"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes an address.
+      security:
+        - bearerAuth: []
+      tags:
+        - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              addressType: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Address deleted!"
+                    deletedAddress: "#address"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 403
+                    Status_Message: "Address not present."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+  /order:
+    post:
+      summary: Adding the cart list to order.
+      security:
+        - bearerAuth: []
+      tags:
+        - Order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/"
+            example:
+              addressType: "#enter-here"
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Success"
+                  Status_Code: 200
+                  Status_Message: "Order placed!"
+                  newOrder: "#oder"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 403
+                  Status_Message: "Address is invalid."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 400
+                  Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                example:
+                  Status: "Failed"
+                  Status_Code: 500
+                  Status_Message: "Server error."
+
+    get:
+      summary: Gets the order.
+      tags:
+        - Order
+      security:
+        - bearerAuth: []
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Order retrieved successfully!"
+                    Order: "#order"
+        "401": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 401
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
+
+    delete:
+      summary: Deletes an order.
+      security:
+        - bearerAuth: []
+      tags:
+        - Order
+
+      responses:
+        "200": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Success"
+                    Status_Code: 200
+                    Status_Message: "Order deleted successfully!"
+                    deletedAddress: "#order"
+        "403": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 403
+                    Status_Message: "Order not present."
+        "400": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 400
+                    Status_Message: "Authorization error."
+        "500": # status code
+          description: A JSON array of the response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  example:
+                    Status: "Failed"
+                    Status_Code: 500
+                    Status_Message: "Server error."
