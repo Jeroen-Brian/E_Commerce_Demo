@@ -17,7 +17,7 @@ import orderRoutes from './routes/orderRoutes'
 
 
 
-const swaggerDocument = YAML.load('../swagger.yaml')
+const swaggerDocument = YAML.load('./swagger.yaml')
 dotenv.config();
 
 

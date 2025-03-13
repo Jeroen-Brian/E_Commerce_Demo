@@ -10,12 +10,18 @@ import { Roles } from "./entity/roles"
 import { Order } from "./entity/order"
 // import { Placed_Orders } from "./entity/placedOrders"
 
+declare var process : {
+    env: {
+      PASSWORD: string
+    }
+  }
+
 export const PostgresDataSource = new DataSource({
     type: "postgres",
-    host: "localhost",
+    host: "postgres_db",
     port: 5432,
     username: "postgres",
-    password: "Jerrycherry@10115",
+    password: process.env.PASSWORD,
     database: "e_commerce",
     logging: true,
     synchronize: true,

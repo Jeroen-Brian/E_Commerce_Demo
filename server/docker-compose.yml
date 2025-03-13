@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  postgres_db:
+    image: postgres:17
+    environment:
+      - POSTGRES_PASSWORD=Jerrycherry@10115
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=e_commerce
+      - POSTGRES_PORT = 5432
+    ports:
+      - 5432:5432
+  app:
+    image: e_commerce:v1
+    env_file:
+      - '.env'
+    ports:
+      - 4000:4500
+    depends_on:
+      - postgres_db
