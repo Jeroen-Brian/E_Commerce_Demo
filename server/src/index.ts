@@ -26,9 +26,9 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}))
 
 
-app.get('/send/:id', async (req: Request, res: Response) => {
-    console.log(req.body, req.params)
-    res.json("Express and TypeORM application")
+app.use('/', async (req: Request, res: Response) => {
+    console.log(`Application ${process.env.APP_NAME} running`)
+    res.json(`Application ${process.env.APP_NAME} is now serving your request.`)
 })
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
@@ -43,7 +43,7 @@ app.use(orderRoutes);
 // app.use(placedOrderRoutes);
 
 
-app.listen(4500, () => console.log(`Server listening on port: http://localhost:4500`))
+app.listen(4500, () => console.log(`${process.env.APP_NAME} Server listening on: http://localhost:4500`))
 
 PostgresDataSource.initialize()
     .then(() => {
